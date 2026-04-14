@@ -71,50 +71,84 @@ Ensure that the static/ folder (containing index.html) is present in the same di
 
 ---
 ## API Endpoints
-Customers
-    GET /api/customers – Retrieve all customers
-    POST /api/customers – Create a new customer
-    GET /api/customers/{id} – Retrieve a customer
-    PUT /api/customers/{id} – Update a customer
-Vehicles
-    GET /api/vehicles – Retrieve all vehicles
-    POST /api/vehicles – Register a vehicle
-    GET /api/vehicles/{id} – Retrieve a vehicle
-    PUT /api/vehicles/{id} – Update a vehicle
-Mechanics
-    GET /api/mechanics – Retrieve all mechanics
-    POST /api/mechanics – Add a mechanic
-    GET /api/mechanics/{id} – Retrieve a mechanic
-    PUT /api/mechanics/{id} – Update a mechanic
-Services
-    GET /api/services – Retrieve all services
-    POST /api/services – Add a service
-    GET /api/services/{id} – Retrieve a service
-    PUT /api/services/{id} – Update a service
-Parts
-    GET /api/parts – Retrieve all parts
-    POST /api/parts – Add a part
-    GET /api/parts/{id} – Retrieve a part
-    PUT /api/parts/{id} – Update a part
-Orders
-    GET /api/orders – Retrieve all orders
-    POST /api/orders – Create an order
-    GET /api/orders/{id} – Retrieve an order
-    POST /api/orders/{id}/assign – Assign a mechanic
-    POST /api/orders/{id}/services – Add service to order
-    DELETE /api/orders/{id}/services/{detailId} – Remove service
-    POST /api/orders/{id}/parts – Add part to order
-    DELETE /api/orders/{id}/parts/{usageId} – Remove part
-    POST /api/orders/{id}/complete – Complete order
-    POST /api/orders/{id}/bill – Generate bill
-Billing and Reports
-    GET /api/bills – Retrieve all bills
-    PUT /api/bills/{id}/pay – Mark bill as paid
-    GET /api/reports/summary – Dashboard statistics
-    GET /api/reports/revenue – Revenue reports
-    GET /api/reports/mechanic – Mechanic performance
-    GET /api/reports/parts – Parts usage
-    GET /api/reports/pending – Active and pending orders
+
+### Customers
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /api/customers | Retrieve all customers |
+| POST | /api/customers | Create a new customer |
+| GET | /api/customers/{id} | Retrieve a specific customer |
+| PUT | /api/customers/{id} | Update a customer |
+
+---
+
+### Vehicles
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /api/vehicles | Retrieve all vehicles |
+| POST | /api/vehicles | Register a vehicle |
+| GET | /api/vehicles/{id} | Retrieve a specific vehicle |
+| PUT | /api/vehicles/{id} | Update a vehicle |
+
+---
+
+### Mechanics
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /api/mechanics | Retrieve all mechanics |
+| POST | /api/mechanics | Add a mechanic |
+| GET | /api/mechanics/{id} | Retrieve a specific mechanic |
+| PUT | /api/mechanics/{id} | Update a mechanic |
+
+---
+
+### Services
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /api/services | Retrieve all services |
+| POST | /api/services | Add a service |
+| GET | /api/services/{id} | Retrieve a specific service |
+| PUT | /api/services/{id} | Update a service |
+
+---
+
+### Parts
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /api/parts | Retrieve all parts |
+| POST | /api/parts | Add a part |
+| GET | /api/parts/{id} | Retrieve a specific part |
+| PUT | /api/parts/{id} | Update a part |
+
+---
+
+### Orders
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /api/orders | Retrieve all orders |
+| POST | /api/orders | Create a new order |
+| GET | /api/orders/{id} | Retrieve a specific order |
+| POST | /api/orders/{id}/assign | Assign a mechanic |
+| GET / POST | /api/orders/{id}/services | List / Add services to order |
+| DELETE | /api/orders/{id}/services/{detailId} | Remove a service from order |
+| GET / POST | /api/orders/{id}/parts | List / Add parts to order |
+| DELETE | /api/orders/{id}/parts/{usageId} | Remove a part from order |
+| POST | /api/orders/{id}/complete | Mark order as completed |
+| POST | /api/orders/{id}/bill | Generate bill for order |
+
+---
+
+### Billing and Reports
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /api/bills | Retrieve all bills |
+| PUT | /api/bills/{id}/pay | Mark bill as paid |
+| GET | /api/reports/summary | Dashboard statistics |
+| GET | /api/reports/revenue | Revenue analysis |
+| GET | /api/reports/mechanic | Mechanic performance |
+| GET | /api/reports/parts | Parts usage analysis |
+| GET | /api/reports/pending | Pending and active orders |
 
 ---
 
