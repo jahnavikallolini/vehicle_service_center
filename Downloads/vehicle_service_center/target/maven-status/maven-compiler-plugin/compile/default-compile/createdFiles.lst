@@ -1,0 +1,11 @@
+com\autoservice\ServiceHandler.class
+com\autoservice\StaticHandler.class
+com\autoservice\BillHandler.class
+com\autoservice\ReportHandler.class
+com\autoservice\PartsHandler.class
+com\autoservice\CustomerHandler.class
+com\autoservice\MechanicHandler.class
+com\autoservice\Server.class
+com\autoservice\VehicleHandler.class
+com\autoservice\DB.class
+com\autoservice\ServiceOrderHandler.class

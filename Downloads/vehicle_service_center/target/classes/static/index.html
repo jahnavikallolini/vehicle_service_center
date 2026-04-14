@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>AutoService Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:       #ffffff;
+  --surface:  #151720;
+  --card:     #1c1f2b;
+  --border:   #2a2e3f;
+  --accent:   #f97316;
+  --accent2:  #fb923c;
+  --blue:     #3b82f6;
+  --green:    #22c55e;
+  --red:      #ef4444;
+  --yellow:   #eab308;
+  --text:     #e2e8f0;
+  --muted:    #64748b;
+  --dim:      #334155;
+  --mono:     'IBM Plex Mono', monospace;
+  --sans:     'IBM Plex Sans', sans-serif;
+  --display:  'Bebas Neue', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; }
+
+/* ─── Layout ────────────────────────────────────────────────────────────── */
+#app { display: flex; height: 100vh; overflow: hidden; }
+
+/* ─── Sidebar ───────────────────────────────────────────────────────────── */
+#sidebar {
+  width: 220px; min-width: 220px; background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  position: relative; z-index: 10;
+}
+.sidebar-logo {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-logo h1 {
+  font-family: var(--display); font-size: 26px; letter-spacing: 2px;
+  color: var(--accent); line-height: 1;
+}
+.sidebar-logo span { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 3px; }
+
+.nav-section { padding: 16px 12px 4px; }
+.nav-section-label { font-family: var(--mono); font-size: 9px; letter-spacing: 3px; color: var(--muted); padding: 0 8px 8px; text-transform: uppercase; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 6px; cursor: pointer;
+  font-size: 13px; font-weight: 500; color: var(--muted);
+  transition: all .15s; border: 1px solid transparent;
+}
+.nav-item:hover { background: var(--card); color: var(--text); }
+.nav-item.active { background: rgba(249,115,22,.12); color: var(--accent); border-color: rgba(249,115,22,.3); }
+.nav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+/* ─── Main ──────────────────────────────────────────────────────────────── */
+#main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+.topbar {
+  height: 56px; padding: 0 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border); background: var(--surface);
+  flex-shrink: 0;
+}
+.topbar-title { font-family: var(--display); font-size: 22px; letter-spacing: 1px; color: var(--text); }
+.topbar-right { display: flex; gap: 10px; align-items: center; }
+
+.content { flex: 1; overflow-y: auto; padding: 28px; }
+
+/* ─── Cards & Grid ──────────────────────────────────────────────────────── */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap: 16px; margin-bottom: 28px; }
+.stat-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+  padding: 20px 18px; position: relative; overflow: hidden;
+}
+.stat-card::before { content:''; position:absolute; top:0;left:0;right:0; height:2px; background: var(--accent); }
+.stat-card.blue::before  { background: var(--blue); }
+.stat-card.green::before { background: var(--green); }
+.stat-card.red::before   { background: var(--red); }
+.stat-card.yellow::before{ background: var(--yellow); }
+.stat-value { font-family: var(--display); font-size: 36px; color: var(--text); line-height: 1; }
+.stat-label { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; color: var(--muted); margin-top: 4px; text-transform: uppercase; }
+
+.card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+  margin-bottom: 20px; overflow: hidden;
+}
+.card-header {
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-title { font-family: var(--mono); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+.card-body { padding: 20px; }
+
+/* ─── Table ─────────────────────────────────────────────────────────────── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); padding: 10px 14px; text-align: left;
+  border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+td { padding: 12px 14px; border-bottom: 1px solid rgba(42,46,63,.5); font-size: 13px; vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(255,255,255,.02); }
+.no-data { text-align: center; color: var(--muted); padding: 40px; font-family: var(--mono); font-size: 12px; }
+
+/* ─── Badges ────────────────────────────────────────────────────────────── */
+.badge {
+  display: inline-block; padding: 3px 10px; border-radius: 99px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 1px; font-weight: 600; text-transform: uppercase;
+}
+.badge-open     { background: rgba(59,130,246,.2);  color: var(--blue);   border: 1px solid rgba(59,130,246,.4); }
+.badge-progress { background: rgba(234,179,8,.2);   color: var(--yellow); border: 1px solid rgba(234,179,8,.4); }
+.badge-completed{ background: rgba(34,197,94,.2);   color: var(--green);  border: 1px solid rgba(34,197,94,.4); }
+.badge-paid     { background: rgba(34,197,94,.2);   color: var(--green);  border: 1px solid rgba(34,197,94,.4); }
+.badge-pending  { background: rgba(234,179,8,.2);   color: var(--yellow); border: 1px solid rgba(234,179,8,.4); }
+.badge-available{ background: rgba(34,197,94,.2);   color: var(--green);  border: 1px solid rgba(34,197,94,.4); }
+.badge-busy     { background: rgba(239,68,68,.2);   color: var(--red);    border: 1px solid rgba(239,68,68,.4); }
+.badge-low      { background: rgba(239,68,68,.2);   color: var(--red);    border: 1px solid rgba(239,68,68,.4); }
+
+/* ─── Buttons ───────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 6px; font-size: 12px; font-family: var(--mono);
+  font-weight: 600; letter-spacing: 1px; cursor: pointer; border: 1px solid transparent;
+  transition: all .15s; white-space: nowrap; text-transform: uppercase;
+}
+.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-primary:hover { background: var(--accent2); }
+.btn-outline { background: transparent; color: var(--text); border-color: var(--border); }
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+.btn-ghost { background: transparent; color: var(--muted); border: none; padding: 6px 10px; }
+.btn-ghost:hover { color: var(--text); }
+.btn-danger { background: rgba(239,68,68,.1); color: var(--red); border-color: rgba(239,68,68,.3); }
+.btn-danger:hover { background: rgba(239,68,68,.2); }
+.btn-sm { padding: 5px 10px; font-size: 10px; }
+.btn-green { background: rgba(34,197,94,.1); color: var(--green); border-color: rgba(34,197,94,.3); }
+.btn-green:hover { background: rgba(34,197,94,.2); }
+.btn-blue { background: rgba(59,130,246,.1); color: var(--blue); border-color: rgba(59,130,246,.3); }
+.btn-blue:hover { background: rgba(59,130,246,.2); }
+
+/* ─── Forms ─────────────────────────────────────────────────────────────── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-grid.cols-1 { grid-template-columns: 1fr; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field.span-2 { grid-column: span 2; }
+.field.span-3 { grid-column: span 3; }
+label { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+input, select, textarea {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 5px;
+  color: var(--text); font-family: var(--sans); font-size: 13px;
+  padding: 9px 12px; width: 100%; outline: none;
+  transition: border-color .15s;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+select option { background: var(--surface); }
+textarea { resize: vertical; min-height: 70px; }
+
+/* ─── Modal ─────────────────────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.7);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100; backdrop-filter: blur(3px);
+  opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  width: 90%; max-width: 620px; max-height: 90vh; overflow-y: auto;
+  transform: translateY(20px); transition: transform .2s;
+}
+.modal-overlay.open .modal { transform: translateY(0); }
+.modal-header {
+  padding: 20px 24px; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.modal-title { font-family: var(--display); font-size: 22px; letter-spacing: 1px; }
+.modal-body { padding: 24px; }
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+
+/* ─── Search bar ────────────────────────────────────────────────────────── */
+.search-bar {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+  padding: 6px 12px;
+}
+.search-bar input { background: none; border: none; padding: 0; font-size: 13px; }
+.search-bar input:focus { outline: none; }
+
+/* ─── Toast ─────────────────────────────────────────────────────────────── */
+#toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+.toast {
+  padding: 12px 18px; border-radius: 6px; font-family: var(--mono); font-size: 12px;
+  color: #fff; min-width: 220px; display: flex; align-items: center; gap: 8px;
+  animation: slideIn .3s ease; border-left: 3px solid transparent;
+}
+.toast-success { background: #1a2e1a; border-color: var(--green); color: var(--green); }
+.toast-error   { background: #2e1a1a; border-color: var(--red);   color: var(--red);   }
+.toast-info    { background: #1a1f2e; border-color: var(--blue);  color: var(--blue);  }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* ─── Detail panel ──────────────────────────────────────────────────────── */
+.detail-section { margin-bottom: 20px; }
+.detail-section h4 { font-family: var(--mono); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+.detail-row { display: flex; gap: 6px; align-items: baseline; margin-bottom: 6px; }
+.detail-key { font-family: var(--mono); font-size: 11px; color: var(--muted); min-width: 140px; }
+.detail-val { font-size: 13px; }
+
+/* ─── Tabs ──────────────────────────────────────────────────────────────── */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+.tab {
+  padding: 10px 18px; cursor: pointer; font-family: var(--mono); font-size: 11px;
+  letter-spacing: 1px; text-transform: uppercase; color: var(--muted);
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: all .15s;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ─── Scrollbar ─────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--dim); border-radius: 3px; }
+
+/* ─── Bill preview ──────────────────────────────────────────────────────── */
+.bill-box {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 20px;
+}
+.bill-line { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.bill-total { display: flex; justify-content: space-between; padding: 12px 0; font-weight: 600; font-size: 16px; color: var(--accent); }
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  #sidebar { width: 60px; min-width: 60px; }
+  .sidebar-logo h1, .nav-section-label, .nav-item span, .sidebar-logo span { display: none; }
+  .nav-item { justify-content: center; }
+  .form-grid, .form-grid.cols-3 { grid-template-columns: 1fr; }
+  .field.span-2, .field.span-3 { grid-column: span 1; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div class="sidebar-logo">
+      <h1>VEHICLE</h1>
+      <span>SERVICE CENTER</span>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Overview</div>
+      <div class="nav-item active" data-page="dashboard"><span class="nav-icon">⬡</span><span>Dashboard</span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Operations</div>
+      <div class="nav-item" data-page="orders"><span class="nav-icon">📋</span><span>Service Orders</span></div>
+      <div class="nav-item" data-page="billing"><span class="nav-icon">💳</span><span>Billing</span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Registry</div>
+      <div class="nav-item" data-page="customers"><span class="nav-icon">👤</span><span>Customers</span></div>
+      <div class="nav-item" data-page="vehicles"><span class="nav-icon">🚗</span><span>Vehicles</span></div>
+      <div class="nav-item" data-page="mechanics"><span class="nav-icon">🔧</span><span>Mechanics</span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Inventory</div>
+      <div class="nav-item" data-page="services"><span class="nav-icon">⚙️</span><span>Services</span></div>
+      <div class="nav-item" data-page="parts"><span class="nav-icon">🔩</span><span>Spare Parts</span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Analytics</div>
+      <div class="nav-item" data-page="reports"><span class="nav-icon">📊</span><span>Reports</span></div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div id="main">
+    <div class="topbar">
+      <div class="topbar-title" id="page-title">DASHBOARD</div>
+      <div class="topbar-right" id="topbar-actions"></div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Modal</div>
+      <button class="btn btn-ghost" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+// ─── CONFIG ──────────────────────────────────────────────────────────────────
+const API = 'http://localhost:8080/api';
+let currentPage = 'dashboard';
+let allCustomers = [], allVehicles = [], allMechanics = [], allServices = [], allParts = [];
+
+// ─── NAV ──────────────────────────────────────────────────────────────────────
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+    el.classList.add('active');
+    currentPage = el.dataset.page;
+    document.getElementById('page-title').textContent = el.querySelector('span:last-child')?.textContent.toUpperCase() || currentPage.toUpperCase();
+    render(currentPage);
+  });
+});
+
+function render(page) {
+  const content = document.getElementById('content');
+  const actions = document.getElementById('topbar-actions');
+  content.innerHTML = '<div class="no-data">Loading…</div>';
+  actions.innerHTML = '';
+  pages[page]?.();
+}
+
+// ─── API HELPERS ─────────────────────────────────────────────────────────────
+async function api(path, method='GET', body=null) {
+  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API + path, opts);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+// ─── TOAST ────────────────────────────────────────────────────────────────────
+function toast(msg, type='success') {
+  const el = document.createElement('div');
+  el.className = `toast toast-${type}`;
+  el.innerHTML = `<span>${type==='success'?'✓':type==='error'?'✕':'ℹ'}</span> ${msg}`;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+// ─── MODAL ────────────────────────────────────────────────────────────────────
+function openModal(title, body, footer) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = body;
+  document.getElementById('modal-footer').innerHTML = footer || '';
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+document.getElementById('modal-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+// ─── CACHE HELPERS ────────────────────────────────────────────────────────────
+async function loadCaches() {
+  [allCustomers, allVehicles, allMechanics, allServices, allParts] = await Promise.all([
+    api('/customers'), api('/vehicles'), api('/mechanics'), api('/services'), api('/parts')
+  ]);
+}
+
+function customerName(id) { return allCustomers.find(c=>c.customer_id==id)?.name || '—'; }
+function vehicleLabel(v)   { return `${v.vehicle_number} (${v.brand} ${v.model})`; }
+function fmt(n)            { return '₹' + Number(n).toLocaleString('en-IN', {minimumFractionDigits:2}); }
+
+// ─── STATUS BADGE ─────────────────────────────────────────────────────────────
+function statusBadge(s) {
+  if (!s) return '';
+  const map = {
+    'Open':'badge-open','In Progress':'badge-progress','Completed':'badge-completed',
+    'Paid':'badge-paid','Pending':'badge-pending','Available':'badge-available','Busy':'badge-busy'
+  };
+  return `<span class="badge ${map[s]||'badge-open'}">${s}</span>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PAGES
+// ═══════════════════════════════════════════════════════════════════════════════
+const pages = {
+
+// ─── DASHBOARD ────────────────────────────────────────────────────────────────
+async dashboard() {
+  const [summary, pending] = await Promise.all([
+    api('/reports/summary'), api('/reports/pending')
+  ]);
+  document.getElementById('content').innerHTML = `
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-value">${summary.total_customers}</div><div class="stat-label">Customers</div></div>
+      <div class="stat-card blue"><div class="stat-value">${summary.total_vehicles}</div><div class="stat-label">Vehicles</div></div>
+      <div class="stat-card yellow"><div class="stat-value">${summary.open_orders + summary.in_progress_orders}</div><div class="stat-label">Active Orders</div></div>
+      <div class="stat-card green"><div class="stat-value">${summary.completed_orders}</div><div class="stat-label">Completed</div></div>
+      <div class="stat-card green"><div class="stat-value">${fmt(summary.total_revenue)}</div><div class="stat-label">Revenue (Paid)</div></div>
+      <div class="stat-card yellow"><div class="stat-value">${fmt(summary.pending_revenue)}</div><div class="stat-label">Pending Dues</div></div>
+      <div class="stat-card red"><div class="stat-value">${summary.low_stock_parts}</div><div class="stat-label">Low Stock Parts</div></div>
+      <div class="stat-card"><div class="stat-value">${summary.total_orders}</div><div class="stat-label">Total Orders</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Active Service Orders</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Date</th><th>Vehicle</th><th>Customer</th><th>Mechanic</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+          ${pending.length ? pending.map(o=>`
+            <tr>
+              <td><span style="font-family:var(--mono);color:var(--accent)">#${o.order_id}</span></td>
+              <td style="font-family:var(--mono);font-size:12px">${o.service_date?.slice(0,10)}</td>
+              <td><strong>${o.vehicle_number}</strong><br><span style="color:var(--muted);font-size:11px">${o.brand} ${o.model}</span></td>
+              <td>${o.customer_name}<br><span style="color:var(--muted);font-size:11px">${o.phone}</span></td>
+              <td>${o.mechanic_name}</td>
+              <td>${statusBadge(o.status)}</td>
+              <td><button class="btn btn-sm btn-outline" onclick="openOrderDetail(${o.order_id})">View</button></td>
+            </tr>`).join('') : '<tr><td colspan="7" class="no-data">No active orders</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+},
+
+// ─── CUSTOMERS ────────────────────────────────────────────────────────────────
+async customers() {
+  const list = await api('/customers');
+  allCustomers = list;
+  document.getElementById('topbar-actions').innerHTML = `<button class="btn btn-primary" onclick="openAddCustomer()">+ Add Customer</button>`;
+  document.getElementById('content').innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">All Customers</span>
+        <div class="search-bar"><span>🔍</span><input id="cust-search" placeholder="Search…" oninput="filterTable('cust-table','cust-search')"/></div>
+      </div>
+      <div class="table-wrap">
+        <table id="cust-table">
+          <thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Email</th><th>Address</th><th>Actions</th></tr></thead>
+          <tbody>
+          ${list.length ? list.map(c=>`
+            <tr>
+              <td><span style="font-family:var(--mono);color:var(--muted)">${c.customer_id}</span></td>
+              <td><strong>${c.name}</strong></td>
+              <td style="font-family:var(--mono)">${c.phone}</td>
+              <td style="color:var(--muted)">${c.email||'—'}</td>
+              <td style="color:var(--muted);max-width:200px">${c.address||'—'}</td>
+              <td>
+                <button class="btn btn-sm btn-outline" onclick="editCustomer(${c.customer_id})">Edit</button>
+                <button class="btn btn-sm btn-ghost" onclick="viewCustomerVehicles(${c.customer_id},'${c.name}')">Vehicles</button>
+              </td>
+            </tr>`).join('') : '<tr><td colspan="6" class="no-data">No customers found</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+},
+
+// ─── VEHICLES ─────────────────────────────────────────────────────────────────
+async vehicles() {
+  const [list] = await Promise.all([api('/vehicles'), loadCaches()]);
+  allVehicles = list;
+  document.getElementById('topbar-actions').innerHTML = `<button class="btn btn-primary" onclick="openAddVehicle()">+ Register Vehicle</button>`;
+  document.getElementById('content').innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">All Vehicles</span>
+        <div class="search-bar"><span>🔍</span><input id="veh-search" placeholder="Search…" oninput="filterTable('veh-table','veh-search')"/></div>
+      </div>
+      <div class="table-wrap">
+        <table id="veh-table">
+          <thead><tr><th>Reg. No.</th><th>Brand / Model</th><th>Fuel</th><th>Year</th><th>Owner</th><th>Actions</th></tr></thead>
+          <tbody>
+          ${list.length ? list.map(v=>`
+            <tr>
+              <td><strong style="font-family:var(--mono);color:var(--accent)">${v.vehicle_number}</strong></td>
+              <td>${v.brand} <span style="color:var(--muted)">${v.model}</span></td>
+              <td><span class="badge badge-open">${v.fuel_type}</span></td>
+              <td style="font-family:var(--mono)">${v.purchase_year}</td>
+              <td>${v.customer_name}</td>
+              <td><button class="btn btn-sm btn-outline" onclick="editVehicle(${v.vehicle_id})">Edit</button></td>
+            </tr>`).join('') : '<tr><td colspan="6" class="no-data">No vehicles found</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+},
+
+// ─── MECHANICS ────────────────────────────────────────────────────────────────
+async mechanics() {
+  const list = await api('/mechanics');
+  allMechanics = list;
+  document.getElementById('topbar-actions').innerHTML = `<button class="btn btn-primary" onclick="openAddMechanic()">+ Add Mechanic</button>`;
+  document.getElementById('content').innerHTML = `
+    <div class="card">
+      <div class="card-header"><span class="card-title">Mechanics</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Name</th><th>Specialization</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+          ${list.length ? list.map(m=>`
+            <tr>
+              <td><strong>${m.name}</strong></td>
+              <td style="color:var(--muted)">${m.specialization}</td>
+              <td style="font-family:var(--mono)">${m.phone}</td>
+              <td>${statusBadge(m.availability_status)}</td>
+              <td>
+                <button class="btn btn-sm btn-outline" onclick="editMechanic(${m.mechanic_id})">Edit</button>
+                <button class="btn btn-sm btn-${m.availability_status==='Available'?'danger':'green'}" onclick="toggleMechanic(${m.mechanic_id},'${m.availability_status}')">
+                  ${m.availability_status==='Available'?'Set Busy':'Set Available'}
+                </button>
+              </td>
+            </tr>`).join('') : '<tr><td colspan="5" class="no-data">No mechanics found</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+},
+
+// ─── SERVICES CATALOG ─────────────────────────────────────────────────────────
+async services() {
+  const list = await api('/services');
+  allServices = list;
+  document.getElementById('topbar-actions').innerHTML = `<button class="btn btn-primary" onclick="openAddService()">+ Add Service</button>`;
+  document.getElementById('content').innerHTML = `
+    <div class="card">
+      <div class="card-header"><span class="card-title">Service Catalog</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Service Name</th><th>Base Cost</th><th>Est. Hours</th><th>Actions</th></tr></thead>
+          <tbody>
+          ${list.length ? list.map(s=>`
+            <tr>
+              <td><strong>${s.service_name}</strong></td>
+              <td style="font-family:var(--mono)">${fmt(s.base_cost)}</td>
+              <td style="font-family:var(--mono)">${s.estimated_hours}h</td>
+              <td><button class="btn btn-sm btn-outline" onclick="editService(${s.service_id})">Edit</button></td>
+            </tr>`).join('') : '<tr><td colspan="4" class="no-data">No services found</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+},
+
+// ─── SPARE PARTS ──────────────────────────────────────────────────────────────
+async parts() {
+  const list = await api('/parts');
+  allParts = list;
+  document.getElementById('topbar-actions').innerHTML = `<button class="btn btn-primary" onclick="openAddPart()">+ Add Part</button>`;
+  document.getElementById('content').innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Spare Parts Inventory</span>
+        <div class="search-bar"><span>🔍</span><input id="parts-search" placeholder="Search…" oninput="filterTable('parts-table','parts-search')"/></div>
+      </div>
+      <div class="table-wrap">
+        <table id="parts-table">
+          <thead><tr><th>Part Name</th><th>Price/Unit</th><th>In Stock</th><th>Stock Status</th><th>Actions</th></tr></thead>
+          <tbody>
+          ${list.length ? list.map(p=>`
+            <tr>
+              <td><strong>${p.part_name}</strong></td>
+              <td style="font-family:var(--mono)">${fmt(p.price)}</td>
+              <td style="font-family:var(--mono)">${p.stock_qty}</td>
+              <td>${p.stock_qty<5?'<span class="badge badge-low">LOW STOCK</span>':'<span class="badge badge-available">OK</span>'}</td>
+              <td><button class="btn btn-sm btn-outline" onclick="editPart(${p.part_id})">Edit</button></td>
+            </tr>`).join('') : '<tr><td colspan="5" class="no-data">No parts found</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+},
+
+// ─── SERVICE ORDERS ──────────────────────────────────────────────────────────
+async orders() {
+  await loadCaches();
+  const list = await api('/orders');
+  document.getElementById('topbar-actions').innerHTML = `<button class="btn btn-primary" onclick="openCreateOrder()">+ New Order</button>`;
+  document.getElementById('content').innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Service Orders</span>
+        <div style="display:flex;gap:8px">
+          <select id="order-filter" onchange="filterOrders()" style="width:auto;padding:6px 10px;font-size:12px">
+            <option value="">All Statuses</option>
+            <option>Open</option><option>In Progress</option><option>Completed</option>
+          </select>
+          <div class="search-bar"><span>🔍</span><input id="ord-search" placeholder="Search…" oninput="filterTable('ord-table','ord-search')"/></div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table id="ord-table">
+          <thead><tr><th>#</th><th>Date</th><th>Vehicle</th><th>Customer</th><th>Mechanic</th><th>Problem</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="ord-tbody">
+          ${list.length ? list.map(o=>orderRow(o)).join('') : '<tr><td colspan="8" class="no-data">No orders</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+},
+
+// ─── BILLING ──────────────────────────────────────────────────────────────────
+async billing() {
+  const list = await api('/bills');
+  document.getElementById('content').innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Bills & Payments</span>
+        <div class="search-bar"><span>🔍</span><input id="bill-search" placeholder="Search…" oninput="filterTable('bill-table','bill-search')"/></div>
+      </div>
+      <div class="table-wrap">
+        <table id="bill-table">
+          <thead><tr><th>Bill #</th><th>Order #</th><th>Vehicle</th><th>Customer</th><th>Labor</th><th>Parts</th><th>Tax</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+          ${list.length ? list.map(b=>`
+            <tr>
+              <td style="font-family:var(--mono);color:var(--accent)">#${b.bill_id}</td>
+              <td style="font-family:var(--mono)">#${b.order_id}</td>
+              <td>${b.vehicle_number||'—'}</td>
+              <td>${b.customer_name||'—'}</td>
+              <td style="font-family:var(--mono)">${fmt(b.labor_total)}</td>
+              <td style="font-family:var(--mono)">${fmt(b.parts_total)}</td>
+              <td style="font-family:var(--mono)">${fmt(b.tax)}</td>
+              <td style="font-family:var(--mono);font-weight:600">${fmt(b.grand_total)}</td>
+              <td>${statusBadge(b.payment_status)}</td>
+              <td>
+                ${b.payment_status==='Pending'?`<button class="btn btn-sm btn-green" onclick="markPaid(${b.bill_id})">Mark Paid</button>`:''}
+              </td>
+            </tr>`).join('') : '<tr><td colspan="10" class="no-data">No bills found</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+},
+
+// ─── REPORTS ──────────────────────────────────────────────────────────────────
+async reports() {
+  const [rev, mech, parts] = await Promise.all([
+    api('/reports/revenue'), api('/reports/mechanic'), api('/reports/parts')
+  ]);
+  document.getElementById('content').innerHTML = `
+    <div class="card">
+      <div class="card-header"><span class="card-title">Revenue by Month</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Month</th><th>Bills</th><th>Revenue</th></tr></thead>
+          <tbody>
+          ${rev.length ? rev.map(r=>`
+            <tr>
+              <td style="font-family:var(--mono)">${r.month}</td>
+              <td>${r.bills}</td>
+              <td style="font-family:var(--mono);font-weight:600;color:var(--green)">${fmt(r.total)}</td>
+            </tr>`).join('') : '<tr><td colspan="3" class="no-data">No data</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Mechanic Performance</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Mechanic</th><th>Specialization</th><th>Total Orders</th><th>Completed</th><th>Status</th></tr></thead>
+          <tbody>
+          ${mech.length ? mech.map(m=>`
+            <tr>
+              <td><strong>${m.name}</strong></td>
+              <td style="color:var(--muted)">${m.specialization}</td>
+              <td style="font-family:var(--mono)">${m.total_orders}</td>
+              <td style="font-family:var(--mono);color:var(--green)">${m.completed}</td>
+              <td>${statusBadge(m.availability_status)}</td>
+            </tr>`).join('') : '<tr><td colspan="5" class="no-data">No data</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Parts Usage</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Part</th><th>Stock Left</th><th>Price/Unit</th><th>Total Used</th><th>Revenue</th></tr></thead>
+          <tbody>
+          ${parts.length ? parts.map(p=>`
+            <tr>
+              <td><strong>${p.part_name}</strong></td>
+              <td style="font-family:var(--mono);color:${p.stock_qty<5?'var(--red)':'inherit'}">${p.stock_qty}</td>
+              <td style="font-family:var(--mono)">${fmt(p.price)}</td>
+              <td style="font-family:var(--mono)">${p.total_used}</td>
+              <td style="font-family:var(--mono);color:var(--green)">${fmt(p.total_revenue)}</td>
+            </tr>`).join('') : '<tr><td colspan="5" class="no-data">No data</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+}; // end pages
+
+// ─── TABLE FILTER ─────────────────────────────────────────────────────────────
+function filterTable(tableId, inputId) {
+  const q = document.getElementById(inputId).value.toLowerCase();
+  document.querySelectorAll(`#${tableId} tbody tr`).forEach(tr => {
+    tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+// ─── ORDER ROW ────────────────────────────────────────────────────────────────
+function orderRow(o) {
+  return `<tr>
+    <td><span style="font-family:var(--mono);color:var(--accent)">#${o.order_id}</span></td>
+    <td style="font-family:var(--mono);font-size:12px">${o.service_date?.slice(0,10)}</td>
+    <td><strong>${o.vehicle_number}</strong><br><span style="color:var(--muted);font-size:11px">${o.brand} ${o.model}</span></td>
+    <td>${o.customer_name}</td>
+    <td>${o.mechanic_name||'<span style="color:var(--muted)">Unassigned</span>'}</td>
+    <td style="max-width:180px;color:var(--muted)">${(o.problem_description||'').slice(0,60)}…</td>
+    <td>${statusBadge(o.status)}</td>
+    <td><button class="btn btn-sm btn-outline" onclick="openOrderDetail(${o.order_id})">Manage</button></td>
+  </tr>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CUSTOMER FORMS
+// ═══════════════════════════════════════════════════════════════════════════════
+function openAddCustomer() {
+  openModal('Add Customer', `
+    <div class="form-grid">
+      <div class="field span-2"><label>Full Name *</label><input id="c-name" placeholder="John Doe"/></div>
+      <div class="field"><label>Phone *</label><input id="c-phone" placeholder="9876543210"/></div>
+      <div class="field"><label>Email</label><input id="c-email" placeholder="john@email.com"/></div>
+      <div class="field span-2"><label>Address</label><textarea id="c-addr" placeholder="Street, City, State"></textarea></div>
+    </div>`,
+    `<button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+     <button class="btn btn-primary" onclick="saveCustomer()">Save Customer</button>`
+  );
+}
+async function saveCustomer(id=null) {
+  const body = { name: v('c-name'), phone: v('c-phone'), email: v('c-email'), address: v('c-addr') };
+  if (!body.name||!body.phone) return toast('Name and phone are required','error');
+  try {
+    if (id) await api('/customers/'+id,'PUT',body); else await api('/customers','POST',body);
+    toast(id?'Customer updated':'Customer added');
+    closeModal(); pages.customers();
+  } catch(e) { toast(e.message,'error'); }
+}
+async function editCustomer(id) {
+  const c = await api('/customers/'+id);
+  openModal('Edit Customer', `
+    <div class="form-grid">
+      <div class="field span-2"><label>Full Name *</label><input id="c-name" value="${esc(c.name)}"/></div>
+      <div class="field"><label>Phone *</label><input id="c-phone" value="${esc(c.phone)}"/></div>
+      <div class="field"><label>Email</label><input id="c-email" value="${esc(c.email||'')}"/></div>
+      <div class="field span-2"><label>Address</label><textarea id="c-addr">${esc(c.address||'')}</textarea></div>
+    </div>`,
+    `<button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+     <button class="btn btn-primary" onclick="saveCustomer(${id})">Update</button>`
+  );
+}
+async function viewCustomerVehicles(id, name) {
+  const vs = await api('/vehicles?customer_id='+id);
+  openModal(`Vehicles – ${name}`, `
+    <table><thead><tr><th>Reg. No.</th><th>Brand/Model</th><th>Fuel</th><th>Year</th></tr></thead><tbody>
+    ${vs.length ? vs.map(v=>`<tr>
+      <td style="font-family:var(--mono);color:var(--accent)">${v.vehicle_number}</td>
+      <td>${v.brand} ${v.model}</td>
+      <td>${v.fuel_type}</td>
+      <td>${v.purchase_year}</td>
+    </tr>`).join('') : '<tr><td colspan="4" class="no-data">No vehicles</td></tr>'}
+    </tbody></table>`,
+    `<button class="btn btn-primary" onclick="closeModal();openAddVehicle(${id})">+ Add Vehicle</button>`
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// VEHICLE FORMS
+// ═══════════════════════════════════════════════════════════════════════════════
+async function openAddVehicle(presetCustomerId=null) {
+  if (!allCustomers.length) await loadCaches();
+  const custOpts = allCustomers.map(c=>`<option value="${c.customer_id}" ${c.customer_id==presetCustomerId?'selected':''}>${c.name} (${c.phone})</option>`).join('');
+  openModal('Register Vehicle', `
+    <div class="form-grid">
+      <div class="field span-2"><label>Customer *</label><select id="v-cust"><option value="">Select customer</option>${custOpts}</select></div>
+      <div class="field"><label>Vehicle Number *</label><input id="v-num" placeholder="KA01AB1234"/></div>
+      <div class="field"><label>Brand *</label><input id="v-brand" placeholder="Maruti"/></div>
+      <div class="field"><label>Model *</label><input id="v-model" placeholder="Swift"/></div>
+      <div class="field"><label>Fuel Type *</label><select id="v-fuel"><option>Petrol</option><option>Diesel</option><option>CNG</option><option>Electric</option><option>Hybrid</option></select></div>
+      <div class="field"><label>Purchase Year *</label><input id="v-year" type="number" value="${new Date().getFullYear()}" min="1990" max="${new Date().getFullYear()}"/></div>
+    </div>`,
+    `<button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+     <button class="btn btn-primary" onclick="saveVehicle()">Register</button>`
+  );
+}
+async function saveVehicle(id=null) {
+  const body = { customer_id:+v('v-cust'), vehicle_number:v('v-num'), brand:v('v-brand'), model:v('v-model'), fuel_type:v('v-fuel'), purchase_year:+v('v-year') };
+  if (!body.customer_id||!body.vehicle_number||!body.brand) return toast('Fill required fields','error');
+  try {
+    if (id) await api('/vehicles/'+id,'PUT',body); else await api('/vehicles','POST',body);
+    toast(id?'Vehicle updated':'Vehicle registered');
+    closeModal(); pages.vehicles();
+  } catch(e) { toast(e.message,'error'); }
+}
+async function editVehicle(id) {
+  if (!allCustomers.length) await loadCaches();
+  const veh = await api('/vehicles/'+id);
+  const custOpts = allCustomers.map(c=>`<option value="${c.customer_id}" ${c.customer_id==veh.customer_id?'selected':''}>${c.name}</option>`).join('');
+  openModal('Edit Vehicle', `
+    <div class="form-grid">
+      <div class="field span-2"><label>Customer *</label><select id="v-cust">${custOpts}</select></div>
+      <div class="field"><label>Vehicle Number *</label><input id="v-num" value="${esc(veh.vehicle_number)}"/></div>
+      <div class="field"><label>Brand *</label><input id="v-brand" value="${esc(veh.brand)}"/></div>
+      <div class="field"><label>Model *</label><input id="v-model" value="${esc(veh.model)}"/></div>
+      <div class="field"><label>Fuel Type *</label>
+        <select id="v-fuel">
+          ${['Petrol','Diesel','CNG','Electric','Hybrid'].map(f=>`<option ${f===veh.fuel_type?'selected':''}>${f}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field"><label>Purchase Year *</label><input id="v-year" type="number" value="${veh.purchase_year}"/></div>
+    </div>`,
+    `<button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+     <button class="btn btn-primary" onclick="saveVehicle(${id})">Update</button>`
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MECHANIC FORMS
+// ═══════════════════════════════════════════════════════════════════════════════
+function openAddMechanic() {
+  openModal('Add Mechanic', `
+    <div class="form-grid">
+      <div class="field span-2"><label>Name *</label><input id="m-name" placeholder="Ravi Kumar"/></div>
+      <div class="field"><label>Phone *</label><input id="m-phone" placeholder="9876543210"/></div>
+      <div class="field"><label>Specialization</label><input id="m-spec" placeholder="Engine, Suspension…"/></div>
+    </div>`,
+    `<button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+     <button class="btn btn-primary" onclick="saveMechanic()">Add Mechanic</button>`
+  );
+}
+async function saveMechanic(id=null) {
+  const body = { name:v('m-name'), phone:v('m-phone'), specialization:v('m-spec')||'General', availability_status:'Available' };
+  if (!body.name||!body.phone) return toast('Name and phone required','error');
+  try {
+    if (id) await api('/mechanics/'+id,'PUT',body); else await api('/mechanics','POST',body);
+    toast(id?'Mechanic updated':'Mechanic added');
+    closeModal(); pages.mechanics();
+  } catch(e) { toast(e.message,'error'); }
+}
+async function editMechanic(id) {
+  const m = await api('/mechanics/'+id);
+  openModal('Edit Mechanic', `
+    <div class="form-grid">
+      <div class="field span-2"><label>Name *</label><input id="m-name" value="${esc(m.name)}"/></div>
+      <div class="field"><label>Phone *</label><input id="m-phone" value="${esc(m.phone)}"/></div>
+      <div class="field"><label>Specialization</label><input id="m-spec" value="${esc(m.specialization||'')}"/></div>
+    </div>`,
+    `<button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+     <button class="btn btn-primary" onclick="saveMechanic(${id})">Update</button>`
+  );
+}
+async function toggleMechanic(id, currentStatus) {
+  const newStatus = currentStatus==='Available' ? 'Busy' : 'Available';
+  const m = await api('/mechanics/'+id);
+  await api('/mechanics/'+id, 'PUT', {...m, availability_status: newStatus});
+  toast(`Mechanic marked ${newStatus}`);
+  pages.mechanics();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SERVICE / PARTS FORMS
+// ═══════════════════════════════════════════════════════════════════════════════
+function openAddService() {
+  openModal('Add Service', `
+    <div class="form-grid cols-1">
+      <div class="field"><label>Service Name *</label><input id="s-name" placeholder="Oil Change"/></div>
+      <div class="field"><label>Base Cost (₹) *</label><input id="s-cost" type="number" placeholder="500"/></div>
+      <div class="field"><label>Estimated Hours *</label><input id="s-hrs" type="number" step="0.5" placeholder="1.5"/></div>
+    </div>`,
+    `<button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+     <button class="btn btn-primary" onclick="saveService()">Add Service</button>`
+  );
+}
+async function saveService(id=null) {
+  const body = { service_name:v('s-name'), base_cost:+v('s-cost'), estimated_hours:+v('s-hrs') };
+  if (!body.service_name||!body.base_cost) return toast('Fill required fields','error');
+  try {
+    if (id) await api('/services/'+id,'PUT',body); else await api('/services','POST',body);
+    toast(id?'Service updated':'Service added');
+    closeModal(); pages.services();
+  } catch(e) { toast(e.message,'error'); }
+}
+async function editService(id) {
+  const s = await api('/services/'+id);
+  openModal('Edit Service', `
+    <div class="form-grid cols-1">
+      <div class="field"><label>Service Name *</label><input id="s-name" value="${esc(s.service_name)}"/></div>
+      <div class="field"><label>Base Cost (₹) *</label><input id="s-cost" type="number" value="${s.base_cost}"/></div>
+      <div class="field"><label>Estimated Hours *</label><input id="s-hrs" type="number" step="0.5" value="${s.estimated_hours}"/></div>
+    </div>`,
+    `<button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+     <button class="btn btn-primary" onclick="saveService(${id})">Update</button>`
+  );
+}
+function openAddPart() {
+  openModal('Add Spare Part', `
+    <div class="form-grid cols-1">
+      <div class="field"><label>Part Name *</label><input id="p-name" placeholder="Air Filter"/></div>
+      <div class="field"><label>Price per Unit (₹) *</label><input id="p-price" type="number" placeholder="250"/></div>
+      <div class="field"><label>Stock Quantity *</label><input id="p-qty" type="number" placeholder="20"/></div>
+    </div>`,
+    `<button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+     <button class="btn btn-primary" onclick="savePart()">Add Part</button>`
+  );
+}
+async function savePart(id=null) {
+  const body = { part_name:v('p-name'), price:+v('p-price'), stock_qty:+v('p-qty') };
+  if (!body.part_name||!body.price) return toast('Fill required fields','error');
+  try {
+    if (id) await api('/parts/'+id,'PUT',body); else await api('/parts','POST',body);
+    toast(id?'Part updated':'Part added');
+    closeModal(); pages.parts();
+  } catch(e) { toast(e.message,'error'); }
+}
+async function editPart(id) {
+  const p = await api('/parts/'+id);
+  openModal('Edit Part', `
+    <div class="form-grid cols-1">
+      <div class="field"><label>Part Name *</label><input id="p-name" value="${esc(p.part_name)}"/></div>
+      <div class="field"><label>Price per Unit (₹) *</label><input id="p-price" type="number" value="${p.price}"/></div>
+      <div class="field"><label>Stock Quantity *</label><input id="p-qty" type="number" value="${p.stock_qty}"/></div>
+    </div>`,
+    `<button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+     <button class="btn btn-primary" onclick="savePart(${id})">Update</button>`
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SERVICE ORDER – CREATE
+// ═══════════════════════════════════════════════════════════════════════════════
+async function openCreateOrder() {
+  await loadCaches();
+  const vehOpts = allVehicles.map(v=>`<option value="${v.vehicle_id}">${v.vehicle_number} – ${v.customer_name} (${v.brand} ${v.model})</option>`).join('');
+  openModal('New Service Order', `
+    <div class="form-grid cols-1">
+      <div class="field"><label>Vehicle *</label><select id="o-veh"><option value="">Select vehicle</option>${vehOpts}</select></div>
+      <div class="field"><label>Service Date *</label><input id="o-date" type="date" value="${new Date().toISOString().slice(0,10)}"/></div>
+      <div class="field"><label>Problem Description *</label><textarea id="o-prob" placeholder="Describe the issue…"></textarea></div>
+    </div>`,
+    `<button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+     <button class="btn btn-primary" onclick="createOrder()">Create Order</button>`
+  );
+}
+async function createOrder() {
+  const body = { vehicle_id:+v('o-veh'), service_date:v('o-date'), problem_description:v('o-prob') };
+  if (!body.vehicle_id||!body.service_date) return toast('Select vehicle and date','error');
+  try {
+    const res = await api('/orders','POST',body);
+    toast('Order created');
+    closeModal();
+    openOrderDetail(res.order_id);
+    pages.orders();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SERVICE ORDER – DETAIL MANAGEMENT
+// ═══════════════════════════════════════════════════════════════════════════════
+async function openOrderDetail(orderId) {
+  await loadCaches();
+  const [order, orderServices, orderParts] = await Promise.all([
+    api('/orders/'+orderId),
+    api('/orders/'+orderId+'/services'),
+    api('/orders/'+orderId+'/parts')
+  ]);
+
+  const availMechanics = allMechanics.filter(m=>m.availability_status==='Available');
+  const mechOpts = allMechanics.map(m=>`<option value="${m.mechanic_id}" ${m.mechanic_id==order.mechanic_id?'selected':''}>${m.name} (${m.availability_status})</option>`).join('');
+  const svcOpts  = allServices.map(s=>`<option value="${s.service_id}" data-cost="${s.base_cost}">${s.service_name} – ${fmt(s.base_cost)}</option>`).join('');
+  const partOpts = allParts.map(p=>`<option value="${p.part_id}" data-price="${p.price}" data-stock="${p.stock_qty}">${p.part_name} – ${fmt(p.price)} (${p.stock_qty} left)</option>`).join('');
+
+  const completed = order.status === 'Completed';
+
+  openModal(`Order #${orderId} – ${order.vehicle_number}`, `
+    <div style="margin-bottom:16px">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px">
+        <span>${statusBadge(order.status)}</span>
+        <span style="font-family:var(--mono);font-size:12px;color:var(--muted)">${order.service_date?.slice(0,10)}</span>
+        <span style="font-family:var(--mono);font-size:12px;color:var(--muted)">${order.brand} ${order.model}</span>
+        <span style="font-family:var(--mono);font-size:12px;color:var(--muted)">${order.customer_name}</span>
+      </div>
+      <div style="color:var(--muted);font-size:13px">${order.problem_description||''}</div>
+    </div>
+
+    <!-- Mechanic Assignment -->
+    ${!completed?`
+    <div class="detail-section">
+      <h4>Assign Mechanic</h4>
+      <div style="display:flex;gap:10px">
+        <select id="od-mech" style="flex:1"><option value="">Select mechanic</option>${mechOpts}</select>
+        <button class="btn btn-blue" onclick="assignMechanic(${orderId})">Assign</button>
+      </div>
+    </div>`:''}
+
+    <!-- Services -->
+    <div class="detail-section">
+      <h4>Services</h4>
+      <table style="margin-bottom:10px">
+        <thead><tr><th>Service</th><th>Cost</th>${!completed?'<th></th>':''}</tr></thead>
+        <tbody id="svc-rows">
+        ${orderServices.length ? orderServices.map(s=>`
+          <tr>
+            <td>${s.service_name}</td>
+            <td style="font-family:var(--mono)">${fmt(s.service_cost)}</td>
+            ${!completed?`<td><button class="btn btn-sm btn-danger" onclick="removeService(${orderId},${s.detail_id})">✕</button></td>`:''}
+          </tr>`).join('') : '<tr><td colspan="3" style="color:var(--muted);padding:10px">No services added</td></tr>'}
+        </tbody>
+      </table>
+      ${!completed?`
+      <div style="display:flex;gap:10px;align-items:center">
+        <select id="od-svc" style="flex:1" onchange="autofillSvcCost()">${svcOpts}</select>
+        <input id="od-svc-cost" type="number" placeholder="Cost" style="width:100px"/>
+        <button class="btn btn-outline" onclick="addService(${orderId})">+ Add</button>
+      </div>`:''}
+    </div>
+
+    <!-- Parts -->
+    <div class="detail-section">
+      <h4>Parts Used</h4>
+      <table style="margin-bottom:10px">
+        <thead><tr><th>Part</th><th>Qty</th><th>Cost</th>${!completed?'<th></th>':''}</tr></thead>
+        <tbody id="part-rows">
+        ${orderParts.length ? orderParts.map(p=>`
+          <tr>
+            <td>${p.part_name}</td>
+            <td style="font-family:var(--mono)">${p.quantity}</td>
+            <td style="font-family:var(--mono)">${fmt(p.line_cost)}</td>
+            ${!completed?`<td><button class="btn btn-sm btn-danger" onclick="removePart(${orderId},${p.usage_id})">✕</button></td>`:''}
+          </tr>`).join('') : '<tr><td colspan="4" style="color:var(--muted);padding:10px">No parts used</td></tr>'}
+        </tbody>
+      </table>
+      ${!completed?`
+      <div style="display:flex;gap:10px;align-items:center">
+        <select id="od-part" style="flex:1">${partOpts}</select>
+        <input id="od-part-qty" type="number" value="1" min="1" style="width:80px" placeholder="Qty"/>
+        <button class="btn btn-outline" onclick="addPart(${orderId})">+ Add</button>
+      </div>`:''}
+    </div>`,
+
+    `${!completed ? `
+      <button class="btn btn-yellow" onclick="generateBill(${orderId})" style="background:rgba(234,179,8,.1);color:var(--yellow);border-color:rgba(234,179,8,.3)">Generate Bill</button>
+      <button class="btn btn-green" onclick="completeOrder(${orderId})">✓ Complete Order</button>
+    ` : ''}
+    <button class="btn btn-outline" onclick="closeModal()">Close</button>`
+  );
+
+  // Auto-fill service cost
+  setTimeout(() => {
+    const sel = document.getElementById('od-svc');
+    if (sel) autofillSvcCost();
+  }, 100);
+}
+
+function autofillSvcCost() {
+  const sel = document.getElementById('od-svc');
+  const cost = sel?.selectedOptions[0]?.dataset.cost;
+  const input = document.getElementById('od-svc-cost');
+  if (cost && input) input.value = cost;
+}
+
+async function assignMechanic(orderId) {
+  const mechId = +v('od-mech');
+  if (!mechId) return toast('Select a mechanic','error');
+  try {
+    await api('/orders/'+orderId+'/assign','POST',{mechanic_id:mechId});
+    toast('Mechanic assigned');
+    openOrderDetail(orderId);
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function addService(orderId) {
+  const svcId = +v('od-svc');
+  const cost   = +v('od-svc-cost');
+  if (!svcId||!cost) return toast('Select service and enter cost','error');
+  try {
+    await api('/orders/'+orderId+'/services','POST',{service_id:svcId,service_cost:cost});
+    toast('Service added');
+    openOrderDetail(orderId);
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function removeService(orderId, detailId) {
+  try {
+    await api('/orders/'+orderId+'/services/'+detailId,'DELETE');
+    toast('Service removed');
+    openOrderDetail(orderId);
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function addPart(orderId) {
+  const partId = +v('od-part');
+  const qty    = +v('od-part-qty');
+  if (!partId||qty<1) return toast('Select part and quantity','error');
+  const part = allParts.find(p=>p.part_id==partId);
+  if (part && qty > part.stock_qty) return toast(`Only ${part.stock_qty} in stock`,'error');
+  try {
+    await api('/orders/'+orderId+'/parts','POST',{part_id:partId,quantity:qty});
+    toast('Part added');
+    openOrderDetail(orderId);
+    allParts = await api('/parts'); // refresh stock
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function removePart(orderId, usageId) {
+  try {
+    await api('/orders/'+orderId+'/parts/'+usageId,'DELETE');
+    toast('Part removed');
+    openOrderDetail(orderId);
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function completeOrder(orderId) {
+  if (!confirm('Mark this order as Completed?')) return;
+  try {
+    await api('/orders/'+orderId+'/complete','POST');
+    toast('Order completed!');
+    openOrderDetail(orderId);
+    if (currentPage==='orders') pages.orders();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function generateBill(orderId) {
+  try {
+    const bill = await api('/orders/'+orderId+'/bill','POST',{tax_rate:18});
+    closeModal();
+    openModal('Bill Generated', `
+      <div class="bill-box">
+        <div class="bill-line"><span>Labor Total</span><span style="font-family:var(--mono)">${fmt(bill.labor_total)}</span></div>
+        <div class="bill-line"><span>Parts Total</span><span style="font-family:var(--mono)">${fmt(bill.parts_total)}</span></div>
+        <div class="bill-line"><span>Tax (18% GST)</span><span style="font-family:var(--mono)">${fmt(bill.tax)}</span></div>
+        <div class="bill-total"><span>GRAND TOTAL</span><span>${fmt(bill.grand_total)}</span></div>
+      </div>
+      <div style="margin-top:12px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--muted)">Bill #${bill.bill_id} · Status: ${bill.payment_status}</div>`,
+      `<button class="btn btn-green" onclick="markPaid(${bill.bill_id});closeModal()">Mark as Paid</button>
+       <button class="btn btn-outline" onclick="closeModal()">Close</button>`
+    );
+    if (currentPage==='billing') pages.billing();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+async function markPaid(billId) {
+  try {
+    await api('/bills/'+billId+'/pay','PUT');
+    toast('Payment recorded!');
+    if (currentPage==='billing') pages.billing();
+  } catch(e) { toast(e.message,'error'); }
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+function v(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+// ─── BOOT ─────────────────────────────────────────────────────────────────────
+loadCaches().catch(()=>{});
+render('dashboard');
+</script>
+</body>
+</html>
